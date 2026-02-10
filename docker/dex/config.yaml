@@ -1,5 +1,5 @@
 # config.yaml
-issuer: http://localhost:5556/dex
+issuer: https://47.236.111.154/dex
 storage:
   type: sqlite3
   config:
@@ -8,7 +8,7 @@ storage:
 web:
   http: 0.0.0.0:5556
   allowedOrigins: ['*']
-  allowedHeaders: ['x-requested-with']
+  allowedHeaders: ['*']
 staticClients:
   - id: daytona
     redirectURIs:
@@ -16,6 +16,10 @@ staticClients:
       - 'http://localhost:3000/api/oauth2-redirect.html'
       - 'http://localhost:3009/callback'
       - 'http://proxy.localhost:4000/callback'
+      - 'https://47.236.111.154'
+      - 'https://47.236.111.154/api/oauth2-redirect.html'
+      - 'https://47.236.111.154/callback'
+      - 'http://47.236.111.154:4000/callback'
     name: 'Daytona'
     public: true
 enablePasswordDB: true

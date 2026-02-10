@@ -1,9 +1,22 @@
 name: daytona
 services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - api
+      - dex
+    networks:
+      - daytona-network
+    restart: always
+
   api:
     image: daytonaio/daytona-api
-    ports:
-      - 3000:3000
     environment:
       - OTEL_ENABLED=true
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318
@@ -20,16 +33,16 @@ services:
       - REDIS_PORT=6379
       - OIDC_CLIENT_ID=daytona
       - OIDC_ISSUER_BASE_URL=http://dex:5556/dex
-      - PUBLIC_OIDC_DOMAIN=http://localhost:5556/dex
+      - PUBLIC_OIDC_DOMAIN=https://47.236.111.154/dex
       - OIDC_AUDIENCE=daytona
       - OIDC_MANAGEMENT_API_ENABLED=
       - OIDC_MANAGEMENT_API_CLIENT_ID=
       - OIDC_MANAGEMENT_API_CLIENT_SECRET=
       - OIDC_MANAGEMENT_API_AUDIENCE=
-      - DASHBOARD_URL=http://localhost:3000/dashboard
-      - DASHBOARD_BASE_API_URL=http://localhost:3000
-      - POSTHOG_API_KEY=phc_bYtEsdMDrNLydXPD4tufkBrHKgfO2zbycM30LOowYNv
-      - POSTHOG_HOST=https://d18ag4dodbta3l.cloudfront.net
+      - DASHBOARD_URL=https://47.236.111.154/dashboard
+      - DASHBOARD_BASE_API_URL=https://47.236.111.154
+      - POSTHOG_API_KEY=
+      - POSTHOG_HOST=
       - POSTHOG_ENVIRONMENT=local
       - TRANSIENT_REGISTRY_URL=http://registry:6000
       - TRANSIENT_REGISTRY_ADMIN=admin
@@ -56,10 +69,10 @@ services:
       - ENVIRONMENT=docker-compose
       - MAX_AUTO_ARCHIVE_INTERVAL=43200
       - MAINTENANCE_MODE=false
-      - PROXY_DOMAIN=proxy.localhost:4000
-      - PROXY_PROTOCOL=http
+      - PROXY_DOMAIN=47.236.111.154.nip.io
+      - PROXY_PROTOCOL=https
       - PROXY_API_KEY=super_secret_key
-      - PROXY_TEMPLATE_URL=http://{{PORT}}-{{sandboxId}}.proxy.localhost:4000
+      - PROXY_TEMPLATE_URL=https://{{PORT}}-{{sandboxId}}.47.236.111.154.nip.io
       - DEFAULT_RUNNER_DOMAIN=runner:3003
       - DEFAULT_RUNNER_API_URL=http://runner:3003
       - DEFAULT_RUNNER_PROXY_URL=http://runner:3003
@@ -106,18 +119,20 @@ services:
       - DAYTONA_API_URL=http://api:3000/api
       - PROXY_PORT=4000
       - PROXY_API_KEY=super_secret_key
-      - PROXY_PROTOCOL=http
+      - PROXY_PROTOCOL=https
       - OIDC_CLIENT_ID=daytona
       - OIDC_CLIENT_SECRET=
       - OIDC_DOMAIN=http://dex:5556/dex
-      - OIDC_PUBLIC_DOMAIN=http://localhost:5556/dex
+      - OIDC_PUBLIC_DOMAIN=https://47.236.111.154/dex
       - OIDC_AUDIENCE=daytona
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - TOOLBOX_ONLY_MODE=false
       - PREVIEW_WARNING_ENABLED=false
+      - COOKIE_DOMAIN=.47.236.111.154.nip.io
     networks:
       - daytona-network
+      - default
     ports:
       - 4000:4000
     restart: always
@@ -136,7 +151,7 @@ services:
       - AWS_SECRET_ACCESS_KEY=minioadmin
       - AWS_DEFAULT_BUCKET=daytona
       - DAYTONA_API_URL=http://api:3000/api
-      - RUNNER_DOMAIN=localhost
+      - RUNNER_DOMAIN=runner
       - SSH_GATEWAY_ENABLE=true
       - SSH_PUBLIC_KEY=c3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBREFRQUJBQUFCZ1FEZUtocFdOYVhVNkpSMnJXekc1NlZJeksrcmsrdForcCtVUmwyeWF5cWRnZGg2bnVOL1NtVnJsYmV4MGlrRVZZemdRWUIwWno5M2dqOVhxSkd4WjJiMHVoSDFzNkp2bnhKZVdIK05rbjBNMzRiRjZkeVloZ3o4M0JaTitWcElJdnVDT1pxYWE4VnlRWjhPdjVLMU00enlmQnFCMld3ejcwZEVWUnFaMnVZckd5U0RqUUIrU3hRQ3phY0djb2JRQTFUd2QxdEJvSk5BaVpPWXFSU3d6TmNoTk5hZHlxSHRGdkZRQ0hhNjZWaVBmQ0FVUGt2cEN6ZGh3TmJGdVhGVWkxbnZOWkx4M056RU41M05LWUhZcWU3Y3dXZkI4QjBoRDhDd3hmSDd6T0o1b1RCMnBMVVlsUWpZRDNsN3k4SkFTbDZpYkpuR1A1SWczVXpZWlRIdUdkNzVXWktnNTRJTVROQlFPMWpJdE9HL0orUm1XbzB0YTdpRkF6ZExyL1BmbDdXTVMwbEZhSm9scTdUVmJLUG1JODFTOU04VEgrbXhLbGZ5b2NqZzhwSUdlQUllcEo3dXl1Vk1xT2wxeVVuSFNycDRlVEVlR0k3NlpCOFRoUzhkYnBLUTIvb2RYMHkwc3FSZDI0Y2lGdnM0dnZVaW80NFdYNlNWRG54dXpWRHc1Rzg9IGRheXRvbmFAMDQwNjZiZDIwY2Vi
     networks:

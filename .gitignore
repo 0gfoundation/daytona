@@ -80,3 +80,9 @@ examples/**/*.png
 !/poetry.lock
 .astro
 .github/instructions/nx.instructions.md
+
+# SSL certificates and private keys
+*.key
+*.crt
+*.pem
+docker/nginx/ssl/
